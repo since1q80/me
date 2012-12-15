@@ -1,0 +1,60 @@
+---
+layout: default
+title: 深入Linux内核
+---
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>2012-12-15-linux-architecture</title>
+    <meta name="author" content="bringmefly">
+    <meta name="generator" content="iA Writer for Mac 1.3">
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+
+    <style type="text/css">
+      body { color: #222; font: normal normal 400 100%/1.5em georgia,serif; margin: 3em auto; width: 40em }
+      a:link { color: #3366CC }
+      a:visited { color: #224488 }
+      blockquote,ol,p,ul { display: block; margin: 0 0 1.5em }
+      blockquote { border-left: solid .1em #E4E4E4; color: #919191; padding: 0 1.5em 0 1.4em }
+      code { font: normal normal 87.5%/1.71428571em monospace,sans-serif }
+      img { display: block; margin: 1.5em auto }
+      pre { display: block; font: normal normal 87.5%/1.71428571em monospace,sans-serif; margin: 1.71428571em }
+      h1,h2,h3,h4,h5,h6 { font-weight: 400 }
+      h1 { font-size: 225%; line-height: 1.3334em; margin: 0 0 .1666em }
+      h2 { font-size: 175%; line-height: 1.28571429em; margin: 0 0 .35714286em }
+      h3 { font-size: 137.5%; line-height: 1.3636em; margin: 0 0 .5em }
+      h4,h5,h6 { font-size: 112.5%; line-height: 1.3334em; margin: 0 0 .7778em }
+      ol,ul { list-style-position: outside; padding: 0 }
+      ol ol,ol ul,ul ol,ul ul { margin: 0 0 .75em 2em }
+      table { border-collapse: collapse; margin: 1.5em 0; width: 100% }
+      td,th { border: solid .1em #000; font-family: sans-serif; font-size: 87.5%; line-height: 1.71428571em; text-align: center }
+    </style>
+  </head>
+  <body>
+    <p>地址空间与特权级别</p>
+<p>Linux 把虚拟地址空间分为两个部分，分别称为内核空间和用户空间</p>
+
+<p>1.特权级别</p>
+<p>所有现代CPU都提供了几种特权级别，进程可以驻留在某一特权级别。</p>
+<p>IA-32体系结构使用4种特权级别构成系统，各级别可以看作环，内环访问更多的功能，外环则较少。</p>
+<p>Linux就只使用两种不同的状态：核心态和用户态</p>
+
+<p>内核线程：从内存到块设备之间的数据同步，到帮助调度器在cpu上分配进程</p>
+<p>ps 置于方括号内的是内核线程，并可限制在某个特定的cpu上运行，以斜线和cpu编号标示。</p>
+
+<p>用页表来为物理地址分配虚拟地址</p>
+<p>物理地址内存页经常称为page frame</p>
+<p>虚拟地址内存页经常称为page</p>
+
+<p>不同的虚拟内存页可以指向相同的物理内存页。因为内核负责将虚拟地址空间映射到物理地址空间，因此可以决定哪些内存区域在进程之间共享，哪些不共享。</p>
+
+<p>＊页表</p>
+<p>用来将虚拟地址空间映射到物理地址空间的数据结构</p>
+
+<p>因为虚拟地址空间的大部分区域都没有使用，因而也没有关联到页帧,那就可以使用功能相同但内存用量少的多的模型：多级分页</p>
+
+  </body>
+</html>
