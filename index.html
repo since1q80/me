@@ -3,7 +3,8 @@ layout: default
 title: 禅叔的世界
 ---
 
-　　<h3>共{{paginator.total_posts}}文章</h3>
+　　<h2>{{ page.title }}</h2>
+　　<p>共{{paginator.total_posts}}文章</p>
 　　<ul>
 　　　　{% for post in site.posts %}
 　　　　　　<li>{{ post.date | date_to_string }} <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
