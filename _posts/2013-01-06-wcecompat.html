@@ -16,5 +16,6 @@ _CRTIMP char* __cdecl strrchr(const char* s, int c)
 	return NULL;
 }
 </pre>
+<p>这段代码是有问题的，会导致死循环，而这个函数就是用在libcurl解析url的时候，如果把这段代码去掉而用微软SDK中的原生api是没有这个问题的，其实改起来也很简单，这里就不多说了。</p>
 
 <p>{{ page.date | date_to_string }}</p>
