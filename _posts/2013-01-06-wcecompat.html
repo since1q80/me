@@ -1,0 +1,20 @@
+---
+layout: post
+title: wcecompat中的bug
+---
+<h2>{{ page.title }}</h2>
+<p>去年在移植libcurl到win auto的时候发现了一个wcecompat的小bug，记录一下。</p>
+<pre class="prettyprint">
+_CRTIMP char* __cdecl strrchr(const char* s, int c)
+{
+	const char*	p = s + strlen(s) - 1;
+	while (p >= s)
+	{
+		if (*p == c)
+			return (char*)p;
+	}
+	return NULL;
+}
+</pre>
+
+<p>{{ page.date | date_to_string }}</p>
