@@ -1,8 +1,9 @@
 ---
 layout: post
-title: 手动Window CE内存方法
+title: 手动查看Window CE内存方法
 ---
 <h2>{{ page.title }}</h2>
+<p>这篇文章来自于a<a href="http://blogs.msdn.com/b/sloh/archive/2005/02/25/380475.aspx">这里</a>觉得挺好，翻译了和大家分享</p>
 <p>任何在CE上开发过一段时间的人都知道，在CE里最多有32个进程，而且每个进程有最大32MB的虚拟地址空间可以用。部分原因是因为Windows CE希望所有进程的地址空间在任何时候都是有用的，即使那些不在运行的进程也需要保持。这一味着地址空间的底层部分被分成了32MB大小均等的“slots”。具体信息如下：</p>
 <p>-32MB十六进制是0x2000000</p>
 <p>-Slot 0 是0x00000000到0x01FFFFFF</p>
