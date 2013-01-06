@@ -1,0 +1,46 @@
+---
+layout: post
+title: 手动查看Window CE内存方法
+---
+<h2>{{ page.title }}</h2>
+<p>这篇文章来自于<a href="http://blogs.msdn.com/b/sloh/archive/2005/02/25/380475.aspx">这里</a>觉得挺好，翻译了和大家分享</p>
+<p>任何在CE上开发过一段时间的人都知道，在CE里最多有32个进程，而且每个进程有最大32MB的虚拟地址空间可以用。部分原因是因为Windows CE希望所有进程的地址空间在任何时候都是有用的，即使那些不在运行的进程也需要保持。这一味着地址空间的底层部分被分成了32MB大小均等的“slots”。具体信息如下：</p>
+<p>-32MB十六进制是0x2000000</p>
+<p>-Slot 0 是0x00000000到0x01FFFFFF</p>
+<p>-Slot 1 是0x02000000到0x03FFFFFF</p>
+<p>-最后一个进程地址结束在0x41FFFFFF</p>
+<p>-从0x42000000到0x7FFFFFFF的地址空间主要是“shared data”用于给VirtualAllocs和内存映射的文件使用，换言之，这里并没有任何符号。</p>
+<p>-地址大于0x80000000的内存是给kernel用的，以及加载到kernel的dlls和可安装的中断服务例程（ISR）的DLL都在这里。</p>
+<p>数一下，你会发现一共是33个slots。Slot 0和1是特殊的slots，它们不能给进程使用，待会会解释。31个slots留给进程运行-第32个进程是kernel。</p>
+<p>Slot 0是一个特殊的slot，它的内容会根据当前运行的进程而变化。当前运行的进程除了它本身的slot外，通常会映射到slot 0。在debugger里可以取得一个EXE中程序的变量如0x00012345。但如果这个变量是来自于slot 0x12000000到0x13FFFFFF所对应的进程中，那么它的地址则会变成0x12012345。</p>
+<p>-试一下。使用Modules&amp;Symbols窗口来查看你的进程跑在哪个slot上，然后把在slot0上的地址换成进程所在slot上的地址，看看是不是得到同样的值。</p>
+<p>理解slot 0在debug时是非常重要的。如果你任意时刻点击“break”按钮，你的进程在那时将停止运行。如果你用Watch窗口试图来查看你进程中的全局变量-debugger可能知道那个变量的地址在哪，但不知道那个变量的值。例如：</p>
+<p>Watch Windows</p>
+<pre class="prettyprint">
+	{,,helloworld.exe} &amp;MyGlobalVar     0x00012345
+	{,,helloworld.exe} MyGlobalVar      ???
+</pre><p>如果helloworld.exe不是当前正在运行的进程，debugger只知道这全局变量的地址，但不是值。但你可以手动把slot 0的地址映射到正确的slot上，假设你知道你的进程运行在哪个slot上。如果helloworld.exe运行在起始地址为0x12000000的slot上，那么你可以在slot 0地址上加上slot的起始地址，例如：</p>
+<p>Watch Window</p>
+<pre class="prettyprint">
+	{,,helloworld.exe} &amp;MyGlobalVar     0x00012345
+  	{,,helloworld.exe} MyGlobalVar      ???
+  	*((DWORD*)0x12012345)               72
+</pre><p>同样，如果你把debugger切换到hello world.exe上，那样也可以知道，我通常是使用Callstack窗口并从hello world.exe里选择一个线程来切换的。那么Watch窗口的内容就可能变成</p>
+<p>Watch Window</p>
+<pre class="prettyprint">
+	{,,helloworld.exe} &amp;MyGlobalVar     0x00012345
+	{,,helloworld.exe} MyGlobalVar      72
+</pre><p>其中的区别就在于现在slot 0地址和debugger所指向的slot地址相同了。</p>
+<p>Slot 1同样夜市一个特殊的slot.所有保存在ROM的"MODULES"部分的DLL都加载到slot 1。这部分DLL的代码-不是数据-加载到slot 1.只有ROM DLLs是加载到slot 1的。如果你放一份新的DLL copy到设备上，来替换已经在ROM里的那个dll,新DLL是不会load到slot 1的。</p>
+<p>-试一下。打开Modules&amp;Symbols窗口来查看各种DLL load的地址。一些会在slot 0,一些会在slot 1.一些可能在kernel范围内。</p>
+<p>-然后再看下这篇blog，你会发现他所post的DLL地址都在slot 1.</p>
+<p>无论当前的进程是什么，Slot 1始终是一样的。这是因为只有code加载在那；如果两个进程加载了slot 1上同一个DLL,它们会共享相同的代码，但是两个DLL实例会有不同的全局变量。这全局变量是保存在进程slot里的-所以它们经常被slot 0引用，就好像所有的东西都是进程本身所拥有的。</p>
+<p>这里所有关于slot 0&amp;1的描述只是为了让你来理解你需要查看的内存是进程相关的，和如何来查看进程相关的内存。如果一个DLL加载到多个进程里，你想在DLL里查看一个全局变量，那么这个全局变量的值在不同的进程中是不同的。你需要确定你要查看的是哪个进程，并了解如何去改变地址。</p>
+<p>另一个你需要了解的细节是，EXE代码是加载在slot的底部（在0x00000000附近），而DLL代码和数据是从slot的顶部开始加载（在0x1FFFFFFF）。在它们之间的是堆空间，线程栈，小的VirtualAllocs，以及其他一些没有符号的东东。</p>
+<p>所谓实践出真知：我们来看看如何确认你想要查看的地址</p>
+<p>-0x00012345可能是代码或者是EXE的一个全局变量。0x0056789A就不是。为什么？因为太大了，那是个巨型的EXE.它很可能是stack或者是heap,或是另一些动态分配的内存，而不是EXE或者是DLL的内容。其实只要看下EXE真实大小就可以判断了。</p>
+<p>-0x03123456是一个slot 1的DLL.0x02123456也是</p>
+<p>-地址0x3456789A是位于起始地址为0x34000000的slot内的进程里的；你可以用Modules&amp;Symobols窗口来查看这是哪个进程。但这很可能不是代码或者全局变量。</p>
+<p>-地址0x19ABCDE可能是来自于DLL。它在slot的顶部，所以它很可能是一个DLL而不是heap或者是stack.同样的0x319ABCDE也是一样的。一个小窍门就是看地址的奇偶。</p>
+
+<p>{{ page.date | date_to_string }}</p>
