@@ -1,5 +1,5 @@
 body { color: #222; font: normal normal 400 100%/1.5em georgia,serif; }
-.page,footer{margin: 3em auto; width: 40em }
+.page{margin: 3em auto; width: 40em }
 a:link { color: #3366CC }
 a:visited { color: #224488 }
 blockquote,ol,p,ul { display: block; margin: 0 0 1.5em }
