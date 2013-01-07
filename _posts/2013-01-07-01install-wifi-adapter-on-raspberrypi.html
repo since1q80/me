@@ -11,7 +11,8 @@ pi@raspberrypi ~/www $ lsusb
 Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 Bus 001 Device 002: ID 0424:9512 Standard Microsystems Corp.
 Bus 001 Device 003: ID 0424:ec00 Standard Microsystems Corp.
-Bus 001 Device 004: ID 0846:9041 NetGear, Inc. WNA1000M 802.11bgn [Realtek RTL8188CUS]
+Bus 001 Device 004: ID 0846:9041 NetGear, Inc. WNA1000M 802.11bgn 
+[Realtek RTL8188CUS]
 </pre>
 <p>然后编辑你的/etc/network/interface文件，你应该会看到如下的信息</p>
 <pre class="prettyprint">
@@ -47,7 +48,8 @@ pi@raspberrypi ~/www $ iwconfig
 lo        no wireless extensions.
 
 wlan0     IEEE 802.11bgn  ESSID:"XXXX"  Nickname:"<WIFI@REALTEK>"
-          Mode:Managed  Frequency:2.437 GHz  Access Point: 14:CF:92:43:06:F2
+          Mode:Managed  Frequency:2.437 GHz  
+          Access Point: 14:CF:92:43:06:F2
           Bit Rate:150 Mb/s   Sensitivity:0/0
           Retry:off   RTS thr:off   Fragment thr:off
           Power Management:off
