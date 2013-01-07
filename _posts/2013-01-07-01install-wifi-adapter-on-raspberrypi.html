@@ -1,0 +1,61 @@
+---
+layout: post
+title: 在Raspberry PI上安装USB wifi adaptor
+---
+<h2>{{ page.title }}</h2>
+<p>Raspberry PI着实是个很好玩的开发板，想知道用Raspberry PI都能干啥，就看看它的<a href="http://www.raspberrypi.org">官网</a>。但是因为它本身不支持wifi，只能用自带的网口，这意味着它只能象个台式机一样，固定在某个可以插网线的地方，着实不方便，所以得想个法子用上wifi。</p>
+<p>好在Raspberry Pi有两个USB口，一个给USB wifi Adaptor用，还有一个可以接USB hub，也不耽误接鼠标，键盘，不过如果有了wifi,直接ssh上去管理也很方便。既然如此，搞了一个Netgear的<a href="http://item.51buy.com/item-178224.html?YTAG=3.21012311">WNA1000M</a>，它用的realtek的芯片，而这个芯片的firmware在raspberry pi的官方最新img中是集成的，所以不需要再额外去下载firmware。</p>
+<p>废话说了一大堆，现在开始入正题，通过网线ssh到你的raspberry pi上先，插入WNA1000M，然后键入lsusb，如果你看到以下信息，恭喜你，你的WNA1000M已经被识别了</p>
+<pre class="prettyprint">
+pi@raspberrypi ~/www $ lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 0424:9512 Standard Microsystems Corp.
+Bus 001 Device 003: ID 0424:ec00 Standard Microsystems Corp.
+Bus 001 Device 004: ID 0846:9041 NetGear, Inc. WNA1000M 802.11bgn [Realtek RTL8188CUS]
+</pre>
+<p>然后编辑你的/etc/network/interface文件，你应该会看到如下的信息</p>
+<pre class="prettyprint">
+auto lo
+
+iface lo inet loopback
+iface eth0 inet dhcp
+
+auto wlan
+allow-hotplug wlan0
+iface wlan0 inet dhcp
+iface default inet dhcp
+</pre>
+<p>现在加入你wifi接入点的配置，配置信息保存在/etc/wpa.conf里，在interface文件里加上</p>
+<pre class="prettyprint">
+wpa-conf /etc/wpa.conf
+</pre>
+<p>然后编辑/etc/wpa.conf，这个文件原先是没有的，自己生成一个，把你的无线路由器的信息比如ssid,认证方式...写在里面，比如</p>
+<pre class="prettyprint">
+network={
+        ssid="XXXX"
+        key_mgmt=WPA-PSK
+        psk="********"
+}
+</pre>
+<p>然后，输入ifup来使配置生效</p>
+<pre class="prettyprint">
+pi@raspberrypi ~/www $ ifup wlan0
+</pre>
+<p>你可以通过iwconfig来查看你的wlan0的配置信息</p>
+<pre class="prettyprint">
+pi@raspberrypi ~/www $ iwconfig
+lo        no wireless extensions.
+
+wlan0     IEEE 802.11bgn  ESSID:"XXXX"  Nickname:"<WIFI@REALTEK>"
+          Mode:Managed  Frequency:2.437 GHz  Access Point: 14:CF:92:43:06:F2
+          Bit Rate:150 Mb/s   Sensitivity:0/0
+          Retry:off   RTS thr:off   Fragment thr:off
+          Power Management:off
+          Link Quality=100/100  Signal level=100/100  Noise level=0/100
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:0  Invalid misc:0   Missed beacon:0
+
+eth0      no wireless extensions.
+</pre>
+<p>大功告成。</p>
+<p>{{ page.date | date_to_string }}</p>
