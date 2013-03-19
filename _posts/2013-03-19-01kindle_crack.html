@@ -1,0 +1,26 @@
+---
+layout: post
+title: kindle的破解
+---
+<h2>{{ page.title }}</h2>
+<p>玩Kindle已经将近2年的时间，最近才想起去破解一下，破解需要理由吗？其实没有那么多道道，只是觉得这个东东在用twitter发书摘的时候不能用中文确实有点不方便，好在网上已经有geek实现了拼音输入法，而要安装这输入法就必须破解</p>
+<p>其实破解kindle是一件很容易的事情，在http://www.mobileread.com/forums/showthread.php?t=88004上下载最新的越狱文件包，我的是Kindle 3G,就选择k3g-K3 3G，如果是wifi版本就选择k3w</p>
+<p>然后在kindle上选择 menu->setting->menu->update your kindle 就ok了.</p>
+<p>接下来就是安装中文输入法了，安装流程也很简单</p>
+<p>1）修改越狱程序白名单</p>
+<p>越过狱的kindle在根目录下有个linkjail目录，把其中etc目录下的whitelist里添加一行:update_pinyin</p>
+<p>2）安装拼音输入法</p>
+<p>在这里下载http://irising.me/download/software/pinyin_0.3.rar，解压后直接找到对应版本的安装bin,copy到根目录</p>
+<p>然后在kindle上选择 menu->setting->menu->update your kindle</p>
+<p>使用方法</p>
+<pre class="prettyprint">
+Sym：呼出输入法/关闭输入法；			中文模式下直接按 . 输入特殊符号；
+Shift：切换中英文输入；				Shift+.：英文模式下输入特殊符号；
+空格：选择当前高亮的文字；			SELECT：选择当前高亮的文字；
+←：向右移动焦点/向右移动光标；		→：向左移动焦点/向左移动光标；
+↑：向上翻页/退出拼音编辑模式；		↓：向下翻页/进入拼音编辑模式；
+Del：删除光标前的拼音。
+
+</pre>
+<p>现在就可以用中文发推了</p>
+<p>{{ page.date | date_to_string }}</p>
